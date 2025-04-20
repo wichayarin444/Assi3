@@ -1,36 +1,33 @@
-# @author: Nongnuch
+# -- coding: utf-8 --
+"""
+Created on Sun Apr 20 15:43:46 2025
+
+@author: LAB
+"""
 
 import streamlit as st
-import numpy as np
-from PIL import Image
 import pickle
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
 
 # Load model
 with open('kmeans_model.pkl', 'rb') as f:
-    model = pickle.load(f)
+    loaded_model = pickle.load(f)
 
-# App title
-st.title("🖼️ Image Classification with MobileNetV2")
+# Page config
+st.set_page_config(page_title="k-Means Clustering App", layout="centered")
+st.title("🔍 k-Means Clustering Visualizer")
+st.subheader("📊 Example Data for Visualization")
+st.markdown("This demo uses example data (2D) to illustrate clustering results.")
 
-# File uploader
-uploaded_file = st.file_uploader("Upload an image...", type=["jpg", "jpeg", "png"])
+# Generate data
+X, _ = make_blobs(n_samples=300, centers=loaded_model.n_clusters, cluster_std=0.60, random_state=0)
 
-if uploaded_file is not None:
-    # Display image
-    img = Image.open(uploaded_file)
-    st.image(img, caption="Uploaded Image", use_column_width=True)
+# Predict
+y_kmeans = loaded_model.predict(X)
 
-    # Preprocess the image
-    img = img.resize((224, 224))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-
-    # Prediction
-    preds = model.predict(x)
-    top_preds = decode_predictions(preds, top=3)[0]
-
-    # Display predictions
-    st.subheader("Predictions:")
-    for i, pred in enumerate(top_preds):
-        st.write(f"{i+1}. **{pred[1]}** - {round(pred[2]*100, 2)}%")
+# Plot
+plt.scatter(X[:, 0], X[:, 1], c=y_kmeans, s=50, cmap='viridis')
+centers = loaded_model.cluster_centers_
+plt.scatter(centers[:, 0], centers[:, 1], c='red', s=200, alpha=0.75)
+st.pyplot(plt)
