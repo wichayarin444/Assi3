@@ -6,7 +6,7 @@ from PIL import Image
 import pickle
 
 # Load model
-with open('model.pkl', 'rb') as f:
+with open('kmeans_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 # App title
